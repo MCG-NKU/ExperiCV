@@ -10,10 +10,10 @@ from basic_ops import *
 
 def convert_line_to_hough(line, size=(32, 32)):
   #请根据霍夫变换定义实现空间的转换过程，补全下方代码
-    H, W = size
-    theta = line.angle()
-    alpha = theta + np.pi / 2
-    r = line.coord[1] - W/2
+    H, W = 
+    theta = 
+    alpha = 
+    r = 
     return alpha, r
   
 def line2hough(line, size=(32, 32)):
