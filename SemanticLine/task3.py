@@ -11,12 +11,12 @@ from basic_ops import *
 def reverse_mapping(point_list, numAngle, numRho, size=(32, 32)):
     #return type: [(y1, x1, y2, x2)]
     H, W = size
-    irho = int(np.sqrt(H*H + W*W) + 1) / ((numRho - 1))
-    itheta = np.pi / numAngle
+    irho = 
+    itheta = 
     b_points = []
     for (thetai, ri) in point_list:  #利用霍夫反变换的公式对图像中的所有的集合进行霍夫反变换
-        theta = thetai * itheta
-        r = ri - numRho // 2
+        theta = 
+        r = 
         cosi = np.cos(theta) / irho
         sini = np.sin(theta) / irho
         x = np.round(r / cosi + W / 2)
