@@ -25,7 +25,7 @@ pip install -r requirements.txt
 
 ## 任务三：HED 算法关键步骤补全实验
 
-在https://drive.google.com/file/d/1iccHFnX-tJyqiVUj3UroNYvaJehs2yeE/view?usp=share_link下载预训练好的backbone文件vgg16.pth，放到hw3文件夹目录下。
+在https://drive.google.com/file/d/1iccHFnX-tJyqiVUj3UroNYvaJehs2yeE/view?usp=share_link 下载预训练好的backbone文件vgg16.pth，放到hw3文件夹目录下。
 补充hw3项目中train.py，models/hed.py代码不完整的部分。
 运行train.py训练模型，默认将模型输出保存在tmp文件夹下，模型保存在checkpoints文件夹下。
 训练完成后运行test.py，测试结果会保存在test文件夹下。
