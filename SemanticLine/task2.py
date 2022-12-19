@@ -61,10 +61,10 @@ class Net(nn.Module):
         return p4
 
     def forward(self, x):
-        _, _, _, p4 = self.backbone(x)
-        p4 = self.dht_detector4(p4)  #对stage4特征进行霍夫变换
+        _, _, _, p4 = 
+        p4 =   #对stage4特征进行霍夫变换
         #分别在每个尺度进行局部信息聚合，将处理后的 Y4 特征图双线性插值到 Y1 的尺寸，以匹配不同层的特征图的分辨率然后将其在通道维度连接在一起，得到融合后的多尺度参数空间表征，
-        cat = self.upsample_cat(p4)
+        cat = 
         #在连接后的特征图上应用一个 1 × 1 卷积层生成像素级别的预测。
-        logist = self.last_conv(cat)
+        logist = 
         return logist
