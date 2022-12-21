@@ -262,14 +262,31 @@ def test(data_root, model_root):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data_root', type=str, default='/home/zhangxuying/Datasets/SOD-Dataset/DUTS')
+    parser.add_argument('--model_name', type=str, default='dss')
+    parser.add_argument('--data_root', type=str, default='./SOD-Dataset/DUTS')
     parser.add_argument('--mode', type=str, default='train')
     parser.add_argument('--model_root', type=str, default='./snapshot/models/')
     parser.add_argument('--log_root', type=str, default='./snapshot/logs/')
     parser.add_argument('--n_epochs', type=int, default=100, help='epoch number')
     parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
+    parser.add_argument('--gpu_id', type=str, default='1', help='train use gpu')
 
     args = parser.parse_args()
+    
+    # set the device for training
+    if args.gpu_id == '0':
+        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+        print('USE GPU 0')
+    elif args.gpu_id == '1':
+        os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+        print('USE GPU 1')
+    elif args.gpu_id == '2':
+        os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+        print('USE GPU 2')
+    elif args.gpu_id == '3':
+        os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+        print('USE GPU 3')
+    cudnn.benchmark = True
 
     # 加载模型，并放置到gpu上
     model = DSS().cuda()
