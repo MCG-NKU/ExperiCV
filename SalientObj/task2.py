@@ -238,7 +238,7 @@ if __name__ == '__main__':
     os.makedirs(save_path, exist_ok=True)
 
     print("Start train...")
-    for epoch in range(1, opt.epoch):
+    for epoch in range(1, opt.n_epoch):
         # schedule
         cosine_schedule.step()
         model.train()
