@@ -1,6 +1,14 @@
+import os
+from datetime import datetime
+
+import torch
 import torchvision
 import torch.nn as nn
+import torch.nn.functional as F
+import torch.backends.cudnn as cudnn
+from torch.utils.data import DataLoader
 
+from task1 import SalObjData
 
 # 包含卷积操作和ReLU的基本卷积块
 class BasicConv2d(nn.Module):
@@ -151,15 +159,120 @@ class DSS(nn.Module):
         # print("x_dsn0: ", x_dsn0.shape) 
         return x_dsn_up60, x_dsn_up50, x_dsn_up40, x_dsn_up30, x_dsn_up20, x_dsn1, x_dsn0
 
-      
+
+def structure_loss(pred, mask):
+    """
+    loss function (ref: F3Net-AAAI-2020)
+    """
+    weit = 1 + 5 * torch.abs(F.avg_pool2d(mask, kernel_size=31, stride=1, padding=15) - mask)
+    wbce = F.binary_cross_entropy_with_logits(pred, mask, reduce='none')
+    wbce = (weit * wbce).sum(dim=(2, 3)) / weit.sum(dim=(2, 3))
+
+    pred = torch.sigmoid(pred)
+    inter = ((pred * mask) * weit).sum(dim=(2, 3))
+    union = ((pred + mask) * weit).sum(dim=(2, 3))
+    wiou = 1 - (inter + 1) / (union - inter + 1)
+    return (wbce + wiou).mean()
+
+
 if __name__ == '__main__':
-    import torch
-    x = torch.randn(4, 3, 256, 256)
-    print('x:', x.shape)
-    model = DSS()
-    # print(model)
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--model_name', type=str, default='dss')
+    parser.add_argument('--n_epoch', type=int, default=100, help='epoch number')
+    parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
+    parser.add_argument('--batchsize', type=int, default=32, help='training batch size')
+    parser.add_argument('--trainsize', type=int, default=256, help='training dataset size')
+    parser.add_argument('--clip', type=float, default=0.5, help='gradient clipping margin')
+    parser.add_argument('--load', type=str, default=None, help='train from checkpoints')
+    parser.add_argument('--gpu_id', type=str, default='1', help='train use gpu')
+
+    parser.add_argument('--data_root', type=str, default='/home/zhangxuying/Datasets/SOD2COD/',
+                        help='the training data root')
+    parser.add_argument('--sod', type=str, default='ICON-P', help='sod method')
+    parser.add_argument('--is_multi_sf', type=bool, default=False, help='wheather using multi-level sf or not')
+    parser.add_argument('--num_workers', type=int, default=8, help='the number of workers in dataloader')
+
+    parser.add_argument('--save_root', type=str,
+                        default='./snapshot/',
+                        help='the path to save model and log')
+    opt = parser.parse_args()
+    print(opt)
+
+
+    # set the device for training
+    if opt.gpu_id == '0':
+        os.environ["CUDA_VISIBLE_DEVICES"] = "0"
+        print('USE GPU 0')
+    elif opt.gpu_id == '1':
+        os.environ["CUDA_VISIBLE_DEVICES"] = "1"
+        print('USE GPU 1')
+    elif opt.gpu_id == '2':
+        os.environ["CUDA_VISIBLE_DEVICES"] = "2"
+        print('USE GPU 2')
+    elif opt.gpu_id == '3':
+        os.environ["CUDA_VISIBLE_DEVICES"] = "3"
+        print('USE GPU 3')
+    cudnn.benchmark = True
     
-    out_list = model(x)
-    print('out:')
-    for out in out_list:
-        print(out.shape)
+    # 模型
+    model = DSS()
+    if opt.load is not None:
+        model.load_state_dict(torch.load(opt.load)['state_dict'])
+        print('load model from ', opt.load)
+    optimizer = torch.optim.Adam(model.parameters(), opt.lr)
+    cosine_schedule = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer=optimizer, T_max=opt.epoch, eta_min=opt.lr*0.01)
+
+    # 训练集
+    train_data = SalObjData(data_root=opt.data_root, mode='train', image_size=256)
+    train_loader = DataLoader(
+        dataset=train_data,
+        batch_size=32, 
+        shuffle=True, 
+        num_workers=8
+    )
+    total_step = len(train_loader)
+
+    save_path = opt.save_root +  '/' + opt.model_name + '/'
+    os.makedirs(save_path, exist_ok=True)
+
+    print("Start train...")
+    for epoch in range(1, opt.epoch):
+        # schedule
+        cosine_schedule.step()
+        model.train()
+        loss_all = 0
+        epoch_step = 0
+
+        for i, (images, gts) in enumerate(train_loader, start=1):
+
+            images = images.cuda()
+            gts = gts.cuda()
+
+            preds = model(x=images)
+            loss = structure_loss(preds, gts)
+            
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
+
+            epoch_step += 1
+            loss_all += loss.data
+
+            if i % 20 == 0 or i == total_step or i == 1:
+                print('{} Epoch [{:03d}/{:03d}], Step [{:04d}/{:04d}], Total_loss: {:.4f}'.
+                    format(datetime.now(), epoch, opt.n_epoch, i, total_step, loss.data))
+        
+        # 记录当前epoch的loss
+        loss_all /= epoch_step
+        print('Epoch [{:03d}/{:03d}]: {}'.format(epoch, opt.n_epoch, loss_all))
+              
+        # 每间隔10个epoch保存一次模型
+        if epoch % 10 == 0:
+            torch.save({
+                'state_dict': model.state_dict(),
+                'epoch': epoch
+            }, save_path + 'Net_epoch_{}.pth'.format(epoch))
+        
+
