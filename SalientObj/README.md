@@ -1,18 +1,26 @@
 # 人工智能实验参考代码-显著性物体检测
+本实验旨在定义一个基于卷积神经网络的显著性物体检测模型，并在该任务的公开数据集[DUTS](https://github.com/LUSSeg/ImageNet-S#imagenet-s-dataset-preparation)上进行训练与测试。
 
 ## 任务一： 数据集加载实验
-双线性插值算法是RoI Align中使用的插值算法，其可以没有误差地进行特征图大小的转化。请根据讲义理解框架代码，在`TODO`部分根据公式实现双线性插值。
+数据是人工智能研究的三大核心要素（算法、算力、数据）之一，本任务要求读者基于Pytorch框架提供的Dataset类，自定义一个数据集类来加载显著性物体检测任务的公开数据集DUTS。该数据集的组织方式如下：
 
-```python
-    # 根据公式进行双线性插值
-    dst = np.zeros(shape=(dst_height, dst_width, src_channel), dtype=np.float32)
-    """
-    TODO: 根据公式进行双线性插值
-    """
-    return dst
+```mind
+DUTS
+    Train
+        Image
+        GT
+        train.txt
+    Test
+        Image
+        GT
+        test.txt  
 ```
+其中，Image和GT分别为存放原始图像和标注图像的文件夹。  
+具体的代码实现请参考```task1.py```。
 
 ## 任务二：显著性物体检测模型的搭建和训练
+模型/算法是人工智能研究的另一个关键要素，
+
 
 Pytorch是常用的深度学习编程框架，其中已经提供了Mask R-CNN的接口，并且可以下载其预训练模型，通过加载模型，可以直接使用Mask R-CNN模型进行实例分割。其中，框架代码实现了使用Mask R-CNN模型对图像进行分割，并获得输出结果，以及获得不同颜色掩码的函数，任务二要求学习框架代码关键函数函数的实现思路，并根据框架代码中实现的函数封装一个使用Mask R-CNN模型进行实例分割的API，API的输入为原始图片，输出为标记好类别，检测框，以及分割掩码的图片，并将其以jpg形式保存。
 
