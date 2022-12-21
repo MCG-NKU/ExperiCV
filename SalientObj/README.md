@@ -1,4 +1,4 @@
-# 人工智能实验参考代码-显著性物体检测
+# 计算机视觉实验参考代码-显著性物体检测
 本实验旨在定义一个基于卷积神经网络的显著性物体检测模型，并在该任务的公开数据集[DUTS](https://github.com/LUSSeg/ImageNet-S#imagenet-s-dataset-preparation)上进行训练与测试。
 
 ## 任务一： 数据集加载实验
