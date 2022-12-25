@@ -57,6 +57,8 @@ def segment_graph(graph_edges, num_nodes, const, min_size, threshold_func):
 ## 深度学习方法分割实验
 请同学们阅读论文DEL: Deep Embedding Learning for Efficient Image Segmentation，根据提示实现基于深度学习的分割方法。
 
+BSDS训练数据集：[here](https://github.com/yun-liu/del#:~:text=can%20be%20found-,here,-.%20In%20the%20provided)
+
 ### 补全超像素pooling
 在`DEL.py`中`superpixel_pooling中接受深度学习的输出，groundtruth标签，超像素标签，返回论文中提到的，每一个区域块的特征。
 
