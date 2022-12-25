@@ -53,3 +53,28 @@ def segment_graph(graph_edges, num_nodes, const, min_size, threshold_func):
 
 
 ```
+
+## 深度学习方法分割实验
+请同学们阅读论文DEL: Deep Embedding Learning for Efficient Image Segmentation，根据提示实现基于深度学习的分割方法。
+
+### 补全超像素pooling
+在`DEL.py`中`superpixel_pooling中接受深度学习的输出，groundtruth标签，超像素标签，返回论文中提到的，每一个区域块的特征。
+
+### 补全loss代码
+按照论文中对loss的描述，补全代码，为每一张照片计算损失函数
+```python
+def sim_loss(superpixel_pooling_out, superpixel_seg_label, sp_label):
+    dx = [-1, 0, 1, 0]
+    dy = [0, -1, 0, 1]
+    height = sp_label.shape[1]
+    width = sp_label.shape[2]
+    total_loss = 0
+    ##
+    ## write your sim loss here
+    ##
+   
+    return total_loss
+```
+
+### 补全测试代码
+DEL中测试过程相较训练有些许区别，需要读者根据论文，补全测试部分，至此完整地复现DEL代码。
