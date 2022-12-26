@@ -115,7 +115,7 @@ class PanopticFPNHead(BaseSemanticHead):
         gt_semantic_seg = gt_semantic_seg.int()
         fg_mask = gt_semantic_seg < self.num_things_classes
         #参考计算前景mask的方式计算背景mask
-        #背景像素需要满足该像素对应的类别标号大于等于num_things_classes−1
+        #背景像素需要满足该像素对应的类别标号大于等于num_things_classes
         #且小于num_things_classes+num_stuff_classes
         bg_mask = ???
         new_gt_seg = torch.clone(gt_semantic_seg)
